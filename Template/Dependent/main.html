@@ -1,0 +1,86 @@
+{% load static %}
+<Html>
+<head>
+	<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+    <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/employees.js' %}"></script>
+	<meta charset="utf-8">
+    
+    
+	<style>
+		.dependent {
+		background-color: #f4511e;
+		color: #ffffff;
+		padding-bottom: 200px;
+		padding-top: 150px;
+		}
+		.form-control{
+		width: 200px;
+		}
+		.table{
+		border-color: #f4511e;
+		}
+	</style>
+</head>
+
+<body>
+
+<form>
+  <div class="dependent" align="center">
+	<h1>Dependent information</h1>
+	<br>
+	<p>this page hold information related with the emplyes such as family members and the side issues</p> 
+		<div class="form-container">
+              <form class="form">
+                  <input id="search" type="text" class="input" placeholder="search..." onkeyup="findById(this.value)"/>
+                  <button id="clear" class="clear-results">clear</button>
+              </form>	
+		</div> 
+  </div>
+</form>
+
+<div align="center">
+  <table class="table">
+  <thead>
+  <tr>
+    <th width="170px">Employee ID</th>
+    <th width="170px">Employee Name</th>
+    <th width="170px">Employee Surname</th>
+    <th width="170px">Add Relation</th>
+  </tr>
+  </head>
+  <tbody id="employee_list"></tbody>
+</table>
+
+<script>
+	let x = JSON.parse('{{emp|escapejs}}');
+	function listEmployees(employees) {
+		var list = '';
+		employees.map(employee => {
+			list += '<tr><td>'+employee.pk+'</td><td>'+employee.fields.name+'</td><td>'+employee.fields.surname+'</td>';
+			var url_mask = "{% url 'allDependent' id=12345 %}".replace(/12345/, employee.pk.toString());
+			list += `<td><a href=`+url_mask+`>Add/Show</a></td></tr>`;
+				});
+
+		$("#employee_list").html(list);
+	}
+	
+	function findById(query) {
+		
+		query = query.toLowerCase();
+		let filteredEmployees = x.filter(employee => {
+			if(employee.pk == query || employee.fields.name.toLowerCase().includes(query) || employee.fields.surname.toLowerCase().includes(query) || query == '') {
+				return employee;
+			}
+		});
+		listEmployees(filteredEmployees);
+		
+		console.log(filteredEmployees)
+	}
+	
+	$(document).ready(function() {
+		listEmployees(x);
+	});
+</script>
+</body>
+</Html>
